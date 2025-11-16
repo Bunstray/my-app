@@ -59,7 +59,7 @@ app.post("/login", async (req, res) => {
       [email]
     );
     if (rows.length === 0)
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" }); //test
 
     const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);

@@ -11,3 +11,23 @@ body {
   font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
+
+/* sponsor scroll animation (left to right smooth) */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  display: inline-flex;
+  animation: scroll 18s linear infinite;
+}
+
+/* small responsive tweak so the underline pill centers correctly on small screens */
+@media (min-width: 420px) {
+  /* no change needed; pill positioning via translate percentages */
+}

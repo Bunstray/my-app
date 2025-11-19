@@ -55,9 +55,10 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Missing fields" });
 
     const rows = await query(
-      "SELECT id, email, username, password FROM users WHERE email = ?",
+      "SELECT id, email, username, password, role FROM users WHERE email = ?",
       [email]
     );
+
     if (rows.length === 0)
       return res.status(404).json({ message: "User not found" }); //test
 
@@ -68,7 +69,12 @@ app.post("/login", async (req, res) => {
 
     return res.json({
       message: "Login successful",
-      user: { id: user.id, email: user.email, username: user.username },
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
     });
   } catch (err) {
     console.error("Login error:", err);
@@ -79,4 +85,59 @@ app.post("/login", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// CREATE EVENT (Admin Only)
+app.post("/events", async (req, res) => {
+  try {
+    const { title, date, category, banner, created_by } = req.body;
+
+    if (!title || !date || !category) {
+      return res.status(400).json({ message: "Incomplete data" });
+    }
+
+    const sql = `
+      INSERT INTO events (title, date, category, banner, created_by, status)
+    VALUES (?, ?, ?, ?, ?, 'uncompleted')
+    `;
+
+    const result = await query(sql, [
+      title,
+      date,
+      category,
+      banner,
+      created_by,
+    ]);
+
+    // ✔ correct single response
+    return res.json({
+      success: true,
+      eventId: result.insertId,
+    });
+  } catch (err) {
+    console.error("Event creation error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET ALL EVENTS
+app.get("/events", async (req, res) => {
+  try {
+    const rows = await query("SELECT * FROM events ORDER BY created_at DESC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Events error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET EVENT BY ID
+app.get("/event/:id", async (req, res) => {
+  const { id } = req.params;
+  const rows = await query("SELECT * FROM events WHERE id = ?", [id]);
+
+  if (rows.length === 0)
+    return res.status(404).json({ message: "Event not found" });
+
+  res.json(rows[0]);
 });

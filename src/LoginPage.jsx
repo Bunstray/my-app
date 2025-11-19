@@ -18,7 +18,12 @@ export default function LoginPage() {
     const data = await res.json();
     if (res.ok) {
       alert(data.message);
-      navigate("/main"); // ✅ Navigate to MainPage
+      localStorage.setItem("id", data.user.id);
+      localStorage.setItem("email", data.user.email);
+      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("role", data.user.role);
+
+      navigate("/home"); // navigate to page after login
     } else {
       alert(data.message);
     }
@@ -29,8 +34,8 @@ export default function LoginPage() {
       <div
         className="w-full h-[25vh] bg-top bg-repeat-x"
         style={{
-          backgroundImage: `url(${batik})`, // ✅ use imported variable
-          backgroundSize: "cover", // optional, adjust fit
+          backgroundImage: `url(${batik})`,
+          backgroundSize: "cover",
         }}
       ></div>
 

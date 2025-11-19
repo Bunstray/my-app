@@ -127,7 +127,7 @@ export default function CreateEventPage() {
           >
             <div className="flex">
               <img
-                src="/images/bandul321.jpg"
+                src={bandul31}
                 alt="321"
                 className="w-28 h-28 object-cover"
               />
@@ -151,11 +151,7 @@ export default function CreateEventPage() {
             } bg-white`}
           >
             <div className="flex">
-              <img
-                src="/images/bandul31.jpg"
-                alt="31"
-                className="w-28 h-28 object-cover"
-              />
+              <img src={bandul31} alt="31" className="w-28 h-28 object-cover" />
               <div className="p-3 bg-linear-to-b from-white to-[#F0DDBB] flex-1">
                 <h2 className="font-semibold">Bandul : 3–1</h2>
                 <p className="text-sm mt-1 text-gray-700">

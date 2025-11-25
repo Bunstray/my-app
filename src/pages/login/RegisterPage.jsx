@@ -1,32 +1,24 @@
 import React, { useState } from "react";
-import batik from "./assets/batik blur 7.png";
+import batik from "/src/assets/batik blur 7.png";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
-export default function LoginPage() {
-  const navigate = useNavigate();
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [conpassword, setConPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/login", {
+  const [showConPassword, setConShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+
+  const handleRegister = async () => {
+    const res = await fetch("http://localhost:5000/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, username, password, conpassword }),
     });
 
     const data = await res.json();
-    if (res.ok) {
-      alert(data.message);
-      localStorage.setItem("id", data.user.id);
-      localStorage.setItem("email", data.user.email);
-      localStorage.setItem("username", data.user.username);
-      localStorage.setItem("role", data.user.role);
-
-      navigate("/home"); // navigate to page after login
-    } else {
-      alert(data.message);
-    }
+    alert(data.message);
   };
 
   return (
@@ -34,8 +26,8 @@ export default function LoginPage() {
       <div
         className="w-full h-[25vh] bg-top bg-repeat-x"
         style={{
-          backgroundImage: `url(${batik})`,
-          backgroundSize: "cover",
+          backgroundImage: `url(${batik})`, // ✅ use imported variable
+          backgroundSize: "cover", // optional, adjust fit
         }}
       ></div>
 
@@ -66,6 +58,33 @@ export default function LoginPage() {
               placeholder="jemparingan@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Username
+          </label>
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+            <svg
+              className="w-5 h-5 text-gray-400 mr-2"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="M22 4 12 13 2 4" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="flex-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
             />
           </div>
@@ -106,12 +125,46 @@ export default function LoginPage() {
           </div>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Confirm Password
+          </label>
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+            <svg
+              className="w-5 h-5 text-gray-400 mr-2"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <input
+              type={showConPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              value={conpassword}
+              onChange={(e) => setConPassword(e.target.value)}
+              className="flex-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setConShowPassword((p) => !p)}
+              className="text-xs text-gray-500 ml-2"
+            >
+              {showConPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+        </div>
+
         {/* Main buttons */}
         <button
-          onClick={handleLogin}
+          onClick={handleRegister}
           className="w-full bg-[#0B132B] text-white font-semibold py-2 rounded-md hover:bg-[#1C2541] transition"
         >
-          Masuk
+          Daftar
         </button>
 
         <button className="w-full border border-[#0B132B]/30 text-[#0B132B] font-medium py-2 rounded-md bg-white hover:bg-gray-100 transition">
@@ -119,12 +172,9 @@ export default function LoginPage() {
         </button>
 
         <p className="text-center text-sm text-gray-700">
-          Belum punya akun?{" "}
-          <Link
-            to="/daftar"
-            className="text-blue-600 font-medium hover:underline"
-          >
-            Daftar
+          Sudah punya akun?{" "}
+          <Link to="/" className="text-blue-600 font-medium hover:underline">
+            Masuk
           </Link>
         </p>
       </div>

@@ -1,19 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./loginpage.jsx";
-import RegisterPage from "./RegisterPage.jsx";
+import LoginPage from "./pages/login/LoginPage.jsx";
+import RegisterPage from "./pages/login/RegisterPage.jsx";
 import "./index.css";
-import MainPage from "./MainPage";
-import NotificationPage from "./NotificationPage";
-import AcaraPage from "./AcaraPage";
-import PeralatanPage from "./PeralatanPage";
-import HasilPage from "./HasilPage";
-import AcaraSayaPage from "./AcaraSayaPage";
-import AccountPage from "./AccountPage";
-import CreateEventPage from "./CreateEventPage";
-import AdminRoute from "./AdminRoute";
-import AdminEventPage from "./AdminEventPage";
+import MainPage from "./pages/home/MainPage.jsx";
+import NotificationPage from "./NotificationPage.jsx";
+import AcaraPage from "./pages/event/AcaraPage.jsx";
+import PeralatanPage from "./PeralatanPage.jsx";
+import HasilPage from "./HasilPage.jsx";
+import AcaraSayaPage from "./AcaraSayaPage.jsx";
+import AccountPage from "./AccountPage.jsx";
+import CreateEventPage from "./pages/create-event/CreateEventPage.jsx";
+import AdminRoute from "./AdminRoute.jsx";
+import AdminEventPage from "./AdminEventPage.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

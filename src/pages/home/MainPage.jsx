@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import bigcat from "./assets/bigcat.png";
-import cat from "./assets/cat.png";
-import stair from "./assets/stair.png";
-import layla from "./assets/layla.png";
-import arrow from "./assets/arrow.png";
-import bow from "./assets/bow.png";
-import graph from "./assets/bar-graph.png";
-import sponsor1 from "./assets/sponsors/sponsor1.png";
-import sponsor2 from "./assets/sponsors/sponsor2.png";
-import sponsor3 from "./assets/sponsors/sponsor3.png";
-import sponsor4 from "./assets/sponsors/sponsor4.png";
-import sponsor5 from "./assets/sponsors/sponsor5.png";
-import sponsor6 from "./assets/sponsors/sponsor6.png";
+import bigcat from "/src/assets/bigcat.png";
+import cat from "/src/assets/cat.png";
+import stair from "/src/assets/stair.png";
+import layla from "/src/assets/layla.png";
+import arrow from "/src/assets/arrow.png";
+import bow from "/src/assets/bow.png";
+import graph from "/src/assets/bar-graph.png";
+import sponsor1 from "/src/assets/sponsors/sponsor1.png";
+import sponsor2 from "/src/assets/sponsors/sponsor2.png";
+import sponsor3 from "/src/assets/sponsors/sponsor3.png";
+import sponsor4 from "/src/assets/sponsors/sponsor4.png";
+import sponsor5 from "/src/assets/sponsors/sponsor5.png";
+import sponsor6 from "/src/assets/sponsors/sponsor6.png";
 
 export default function MainPage() {
   const navigate = useNavigate();

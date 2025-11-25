@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import placeholderbanner from "./assets/Banner/placeholderbanner.png";
-import bandul321 from "./assets/Bandul/bandul3-2-1.png";
-import bandul31 from "./assets/Bandul/bandul3-1.png";
+import placeholderbanner from "/src/assets/Banner/placeholderbanner.png";
+import bandul321 from "/src/assets/Bandul/bandul3-2-1.png";
+import bandul31 from "/src/assets/Bandul/bandul3-1.png";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();
@@ -174,7 +174,7 @@ export default function CreateEventPage() {
 
           <button
             onClick={handleProceed}
-            className="flex-1 py-2 rounded-lg bg-[#1A1A1A] text-white"
+            className="flex-1 py-2 rounded-lg bg-[#0A192F] text-white"
           >
             Lanjut
           </button>

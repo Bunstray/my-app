@@ -39,7 +39,7 @@ export default function AcaraPage() {
     <div className="min-h-screen w-full bg-[#F8F1E4] px-4 py-6">
       {/* 🔙 BACK BUTTON */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/home")}
         className="mb-4 text-[#1F1F1F] font-semibold"
       >
         ← Kembali

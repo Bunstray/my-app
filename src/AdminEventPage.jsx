@@ -11,6 +11,7 @@ export default function AdminEventPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {rank, setRank} = useState(null);
   useEffect(() => {
     if (!id) return;
     async function fetchEvent() {
@@ -28,6 +29,8 @@ export default function AdminEventPage() {
     }
     fetchEvent();
   }, [id]);
+
+
 
   if (loading) {
     return (
@@ -64,7 +67,7 @@ export default function AdminEventPage() {
           </div>
           <div className="w-full flex flex-row gap-2 my-4">
             <div className="w-1/2 border-2 border-[#00000080] rounded-lg bg-[#FFF3DB]">
-              <button className="flex justify-center items-center w-full p-3 h-full gap-2 cursor-pointer">
+              <button className="flex justify-around items-center w-full p-3 h-full cursor-pointer">
                 <span className="font-bold text-lg">120</span>
                 <p className="text-sm">Peserta Terdata</p>
               </button>
@@ -86,6 +89,36 @@ export default function AdminEventPage() {
               </div>
             </form>
           </div>
+          <div className="w-full flex gap-4 mt-4">
+            <button onClick={() => setRank(0)} className="bg-[#10284C]  cursor-pointer text-white p-2 rounded-lg">
+              Input skor
+            </button>
+            <button onClick={() => setRank(1)} className="bg-[#F2EADA] cursor-pointer border border-[#000000] p-2 rounded-lg">
+              Peringkat
+            </button>
+          </div>
+            <div className='flex items-center mt-4 bg-[#10284C] font-semibold text-white h-[45px] w-full rounded-t-lg'>
+                <p className='ml-3'>Daftar Atlet</p>
+            </div>
+            <div className='flex items-center justify-center bg-[#FFF3DB] h-[233px] w-full rounded-b-lg border p-4 border-black/50'>
+                <div className='flex flex-col p-3 bg-[#F2CE92] font-semibold h-[209px] w-full rounded-lg border'>
+                    <p>Atlet1</p>
+                    <p className='mt-1.5'>Total Skor: 0 | <span>Jumlah Meleset: 0</span></p>
+                    <p className='mt-3'>Skor seri:</p>
+                    <div className='flex justify-center flex-row mt-2 gap-2'>
+                        <button className='flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg'>1</button>
+                        <button className='flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg'>2</button>
+                        <button className='flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg'>3</button>
+                        <button className='flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg'>4</button>
+                    </div>
+                    <div className='flex justify-center flex-row mt-2 gap-2'>
+                        <button className='flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black'>3</button>
+                        <button className='flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black'>1</button>
+                        <button className='flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black'>Meleset</button>
+                    </div>
+                </div>
+                
+            </div>
         </div>
       </div>
         <div className="fixed bottom-0 bg-[#FCE8CA] rounded-t-lg h-[12vh] py-4 w-full text-sm border border-[#00000080]">

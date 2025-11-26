@@ -130,7 +130,7 @@ export default function AdminEventPage() {
             <p>
               Seri: 1/20
             </p>
-            <button className="bg-[#10284C] border-[#1E1E1E] border rounded-lg p-2 text-white flex items-center justify-around gap-1 w-28">
+            <button clasName="bg-[#10284C] border-[#1E1E1E] border rounded-lg p-2 text-white flex items-center justify-around gap-1 w-28">
               <p>Lanjut</p>
               <img src="/src/assets/right-white.svg" alt="" />
             </button>

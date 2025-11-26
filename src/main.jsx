@@ -14,6 +14,8 @@ import AccountPage from "./AccountPage.jsx";
 import CreateEventPage from "./pages/create-event/CreateEventPage.jsx";
 import AdminRoute from "./AdminRoute.jsx";
 import AdminEventPage from "./AdminEventPage.jsx";
+import LupaPWPage from "./pages/login/LupaPW.jsx";
+import ChangePasswordPage from "./pages/login/ChangePW.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -29,6 +31,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/acarasaya" element={<AcaraSayaPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/acara/create" element={<CreateEventPage />} />
+        <Route path="/resetpw" element={<LupaPWPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route
           path="/admin/event/:id"
           element={

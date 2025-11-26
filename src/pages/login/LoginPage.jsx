@@ -8,24 +8,30 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      alert(data.message);
-      localStorage.setItem("id", data.user.id);
-      localStorage.setItem("email", data.user.email);
-      localStorage.setItem("username", data.user.username);
-      localStorage.setItem("role", data.user.role);
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        localStorage.setItem("id", data.user.id);
+        localStorage.setItem("email", data.user.email);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("role", data.user.role);
 
-      navigate("/home"); // navigate to page after login
-    } else {
-      alert(data.message);
+        navigate("/home");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Terjadi kesalahan pada server");
     }
   };
 
@@ -42,13 +48,15 @@ export default function LoginPage() {
       <h1 className="mt-6 text-2xl font-extrabold text-[#0B132B]">
         MyJemparingan
       </h1>
-      {/*username*/}
+
+      {/* Input Container */}
       <div className="w-[85%] max-w-sm mt-6 space-y-4">
+        {/* Email */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
           </label>
-          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-[#0B132B] focus-within:border-transparent transition">
             <svg
               className="w-5 h-5 text-gray-400 mr-2"
               viewBox="0 0 24 24"
@@ -73,10 +81,12 @@ export default function LoginPage() {
 
         {/* Password */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+          </div>
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-[#0B132B] focus-within:border-transparent transition">
             <svg
               className="w-5 h-5 text-gray-400 mr-2"
               viewBox="0 0 24 24"
@@ -99,26 +109,32 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword((p) => !p)}
-              className="text-xs text-gray-500 ml-2"
+              className="text-xs text-gray-500 ml-2 hover:text-gray-700"
             >
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
+          <Link
+            to="/resetpw"
+            className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+          >
+            Lupa Password?
+          </Link>
         </div>
 
         {/* Main buttons */}
         <button
           onClick={handleLogin}
-          className="w-full bg-[#0B132B] text-white font-semibold py-2 rounded-md hover:bg-[#1C2541] transition"
+          className="w-full bg-[#0B132B] text-white font-semibold py-2 rounded-md hover:bg-[#1C2541] transition shadow-sm mt-6"
         >
           Masuk
         </button>
 
-        <button className="w-full border border-[#0B132B]/30 text-[#0B132B] font-medium py-2 rounded-md bg-white hover:bg-gray-100 transition">
+        <button className="w-full border border-[#0B132B]/30 text-[#0B132B] font-medium py-2 rounded-md bg-white hover:bg-gray-100 transition shadow-sm">
           Masuk sebagai Tamu
         </button>
 
-        <p className="text-center text-sm text-gray-700">
+        <p className="text-center text-sm text-gray-700 pt-2">
           Belum punya akun?{" "}
           <Link
             to="/daftar"

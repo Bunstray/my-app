@@ -27,7 +27,5 @@ body {
   animation: scroll 18s linear infinite;
 }
 
-/* small responsive tweak so the underline pill centers correctly on small screens */
 @media (min-width: 420px) {
-  /* no change needed; pill positioning via translate percentages */
 }

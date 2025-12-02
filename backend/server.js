@@ -14,11 +14,7 @@ const app = express();
 
 // --- MIDDLEWARE ---
 app.use(express.json());
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Frontend URL
-  })
-);
+app.use(cors());
 
 // --- DB HELPER ---
 async function query(sql, params) {

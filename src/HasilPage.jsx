@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import placeholderbanner from "/src/assets/Banner/placeholderbanner.png";
+import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
 export default function HasilPage() {
   const navigate = useNavigate();

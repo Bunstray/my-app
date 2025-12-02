@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import placeholderbanner from "/src/assets/Banner/placeholderbanner.png";
-import bandul321 from "/src/assets/Bandul/bandul3-2-1.png";
-import bandul31 from "/src/assets/Bandul/bandul3-1.png";
+import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
+import bandul321 from "/src/assets/Bandul/Bandul3-2-1.png";
+import bandul31 from "/src/assets/Bandul/Bandul3-1.png";
 
 export default function CreateEventPage() {
   const navigate = useNavigate();

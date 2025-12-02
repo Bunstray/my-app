@@ -10,7 +10,7 @@ export default function HasilPage() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const res = await fetch("http://localhost:5000/events");
+        const res = await fetch("http://34.204.192.78/events");
         const data = await res.json();
         // Filter ONLY completed events
         const completedEvents = data.filter((e) => e.status === "completed");

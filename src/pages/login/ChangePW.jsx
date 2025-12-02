@@ -36,7 +36,7 @@ export default function ChangePasswordPage() {
 
       if (isResetMode) {
         // Forgot Password Flow
-        url = "http://localhost:5000/reset-password";
+        url = "http://34.204.192.78/reset-password";
         body = { token, newPassword };
       } else {
         // Logged In Change Password Flow
@@ -51,7 +51,7 @@ export default function ChangePasswordPage() {
           return;
         }
 
-        url = "http://localhost:5000/change-password-logged-in";
+        url = "http://34.204.192.78/change-password-logged-in";
         body = { userId, oldPassword, newPassword };
       }
 

@@ -41,7 +41,7 @@ export default function CreateEventPage() {
 
     const created_by = localStorage.getItem("id");
 
-    const res = await fetch("http://localhost:5000/events", {
+    const res = await fetch("http://34.204.192.78/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

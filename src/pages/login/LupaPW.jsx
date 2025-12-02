@@ -16,7 +16,7 @@ export default function LupaPwWage() {
     setLoading(true);
     try {
       // 1. Send the email to the backend
-      const res = await fetch("http://localhost:5000/forgot-password", {
+      const res = await fetch("http://34.204.192.78/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

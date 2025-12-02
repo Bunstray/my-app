@@ -1,25 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import batik from "/src/assets/batik blur 7.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  // Renamed 'email' to 'identifier' to match its new dual purpose
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Check if already logged in
+  useEffect(() => {
+    const userId = localStorage.getItem("id");
+    if (userId) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleLogin = async () => {
     try {
       const res = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        // Send as 'identifier' to the backend
+        body: JSON.stringify({ identifier, password }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        alert(data.message);
+        // alert(data.message); // Optional alert
         localStorage.setItem("id", data.user.id);
         localStorage.setItem("email", data.user.email);
         localStorage.setItem("username", data.user.username);
@@ -40,7 +50,9 @@ export default function LoginPage() {
       <div
         className="w-full h-[25vh] bg-top bg-repeat-x"
         style={{
+          // Use a placeholder for the preview, uncomment the line below for local use
           backgroundImage: `url(${batik})`,
+          // backgroundImage: "linear-gradient(to right, #0B132B, #1C2541)",
           backgroundSize: "cover",
         }}
       ></div>
@@ -51,10 +63,10 @@ export default function LoginPage() {
 
       {/* Input Container */}
       <div className="w-[85%] max-w-sm mt-6 space-y-4">
-        {/* Email */}
+        {/* Email / Username Input */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            Email / Username
           </label>
           <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-[#0B132B] focus-within:border-transparent transition">
             <svg
@@ -70,10 +82,10 @@ export default function LoginPage() {
               <path d="M22 4 12 13 2 4" />
             </svg>
             <input
-              type="email"
-              placeholder="jemparingan@gmail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Email or Username"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               className="flex-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
             />
           </div>
@@ -101,7 +113,7 @@ export default function LoginPage() {
             </svg>
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="letsgojemparingan"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="flex-1 outline-none text-gray-700 placeholder-gray-400 bg-transparent"

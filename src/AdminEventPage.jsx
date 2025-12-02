@@ -1,181 +1,612 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 
 export default function AdminEventPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // -- STATE --
   const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { rank, setRank } = useState(null);
+  const [banduls, setBanduls] = useState([]);
+  const [selectedBandulId, setSelectedBandulId] = useState(null);
+  const [participants, setParticipants] = useState([]);
+  const [rambahan, setRambahan] = useState(1);
+  const [viewMode, setViewMode] = useState("input"); // 'input' or 'rank'
+
+  // UI State
+  const [expandedParticipant, setExpandedParticipant] = useState(null);
+  const [selectedArrowSlot, setSelectedArrowSlot] = useState(1);
+  const [unsavedChanges, setUnsavedChanges] = useState({});
+  const [showLockConfirm, setShowLockConfirm] = useState(false); // Modal state
+
+  // Leaderboard State
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [rankType, setRankType] = useState("total");
+
+  const componentRef = useRef(null);
+
+  // -- FETCHING DATA --
   useEffect(() => {
-    if (!id) return;
-    async function fetchEvent() {
-      setLoading(true);
-      try {
-        const res = await fetch(`http://localhost:5000/event/${id}`);
-        if (!res.ok) throw new Error("Event not found");
-        const data = await res.json();
-        setEvent(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEvent();
+    fetchEventDetails();
+    fetchBanduls();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="p-4">
-        <p>Loading event...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (viewMode === "input" && selectedBandulId) {
+      fetchParticipants();
+    } else if (viewMode === "rank") {
+      fetchLeaderboard();
+    }
+  }, [selectedBandulId, rambahan, viewMode, rankType]);
 
-  if (error) {
-    return (
-      <div className="p-4">
-        <p className="text-red-500">{error}</p>
-      </div>
+  const fetchEventDetails = async () => {
+    const res = await fetch(`http://localhost:5000/event/${id}`);
+    const data = await res.json();
+    setEvent(data);
+  };
+
+  const fetchBanduls = async () => {
+    const res = await fetch(`http://localhost:5000/event/${id}/bandul`);
+    const data = await res.json();
+    setBanduls(data);
+    if (data.length > 0 && !selectedBandulId) setSelectedBandulId(data[0].id);
+  };
+
+  const fetchParticipants = async () => {
+    if (!selectedBandulId) return;
+    const res = await fetch(
+      `http://localhost:5000/bandul/${selectedBandulId}/participants?rambahan=${rambahan}`
     );
-  }
+    const data = await res.json();
+
+    const initialScores = {};
+    data.forEach((p) => {
+      initialScores[p.id] = {
+        arrow1: p.arrow1 || 0,
+        arrow2: p.arrow2 || 0,
+        arrow3: p.arrow3 || 0,
+        arrow4: p.arrow4 || 0,
+      };
+    });
+    setUnsavedChanges(initialScores);
+    setParticipants(data);
+  };
+
+  const fetchLeaderboard = async () => {
+    let url = `http://localhost:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
+    if (selectedBandulId) url += `&bandulId=${selectedBandulId}`;
+    else url += `&bandulId=all`;
+    const res = await fetch(url);
+    const data = await res.json();
+    setLeaderboardData(data);
+  };
+
+  // -- LOGIC HELPERS --
+  const currentBandul = banduls.find((b) => b.id === selectedBandulId);
+  const allBandulsLocked =
+    banduls.length > 0 && banduls.every((b) => !!b.is_locked); // Fixed boolean check
+
+  const isInputAllowed =
+    event?.status === "uncompleted" &&
+    currentBandul &&
+    !currentBandul.is_locked; // This checks 0 or 1 correctly in logic
+
+  // -- HANDLERS --
+
+  const handleUpdateEventStatus = async (newStatus) => {
+    const confirmMsg =
+      newStatus === "uncompleted"
+        ? "Mulai acara? Status akan berubah menjadi 'Uncompleted'."
+        : "Selesaikan acara? Event akan ditutup.";
+
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      await fetch(`http://localhost:5000/event/${id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      fetchEventDetails();
+    } catch (err) {
+      alert("Gagal update status");
+    }
+  };
+
+  const handleLockBandul = async () => {
+    try {
+      await fetch(`http://localhost:5000/bandul/${selectedBandulId}/lock`, {
+        method: "PUT",
+      });
+      setShowLockConfirm(false);
+      fetchBanduls(); // Refresh to get new lock status
+    } catch (err) {
+      alert("Gagal mengunci bandul");
+    }
+  };
+
+  const handleScoreInput = (value) => {
+    if (!expandedParticipant || !isInputAllowed) return;
+
+    setUnsavedChanges((prev) => ({
+      ...prev,
+      [expandedParticipant]: {
+        ...prev[expandedParticipant],
+        [`arrow${selectedArrowSlot}`]: value,
+      },
+    }));
+
+    if (selectedArrowSlot < 4) setSelectedArrowSlot(selectedArrowSlot + 1);
+  };
+
+  const saveScore = async (participantId) => {
+    const scores = unsavedChanges[participantId];
+    try {
+      await fetch("http://localhost:5000/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participant_id: participantId,
+          rambahan: rambahan,
+          ...scores,
+        }),
+      });
+      setExpandedParticipant(null);
+      fetchParticipants();
+    } catch (err) {
+      alert("Failed to save score");
+    }
+  };
+
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: `Hasil-${event?.title || "Jemparingan"}`,
+  });
+
+  const handleModeSwitch = (mode) => {
+    setViewMode(mode);
+    if (mode === "input" && !selectedBandulId && banduls.length > 0) {
+      setSelectedBandulId(banduls[0].id);
+    }
+  };
+
+  if (!event) return <div className="p-4">Loading event...</div>;
+
+  const getScoreButtons = () => {
+    const category = event.category;
+    const buttons = [];
+    if (category === "3-2-1") {
+      buttons.push({ val: 3, label: "3", color: "bg-red-500 text-white" });
+      buttons.push({ val: 2, label: "2", color: "bg-yellow-400 text-black" });
+      buttons.push({ val: 1, label: "1", color: "bg-white text-black" });
+    } else {
+      buttons.push({
+        val: 3,
+        label: "3 (Kepala)",
+        color: "bg-red-500 text-white",
+      });
+      buttons.push({
+        val: 1,
+        label: "1 (Badan)",
+        color: "bg-white text-black",
+      });
+    }
+    buttons.push({ val: 0, label: "Meleset", color: "bg-black text-white" });
+    return buttons;
+  };
 
   return (
-    <div className="bg-[#FFFAF0] h-screen">
-      <div>
-        <button
-          onClick={() => navigate("/acara")}
-          className="fixed bg-[#10284C] top-12 left-5 p-2 text-[#FFFFFF] rounded-xl text-sm cursor-pointer flex gap-2 items-center"
-        >
-          <img src="/src/assets/back.svg" alt="" />
-          Kembali
-        </button>
+    <div className="bg-[#FFFAF0] min-h-screen flex flex-col font-poppins pb-32">
+      {/* NAVIGATION OVERLAY BUTTON */}
+      <button
+        onClick={() => navigate("/acara")}
+        className="fixed top-4 left-4 z-20 bg-[#10284C] text-white p-2 rounded-xl text-sm shadow-md flex gap-2 items-center"
+      >
         <img
-          src="/src/assets/banner/PlaceholderBanner.png"
+          src="/src/assets/back.svg"
           alt=""
-          className="w-full"
+          className="w-4 h-4 brightness-0 invert"
         />
-        <div className="p-4">
-          <div className="font-poppins flex justify-between">
-            <div className="flex flex-col gap-2">
-              <h2 className="font-bold text-xl text-[#10284C]">
-                {event.title}
-              </h2>
-              <p>{event.category}</p>
-            </div>
+        Kembali
+      </button>
+
+      {/* HEADER SECTION */}
+      <div className="bg-[#FFFAF0] sticky top-0 z-10 shadow-sm">
+        <div className="w-full h-48 overflow-hidden relative">
+          <img
+            src={event.banner || "/src/assets/banner/PlaceholderBanner.png"}
+            alt="Event Banner"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute bottom-0 w-full h-10 bg-gradient-to-t from-[#FFFAF0] to-transparent"></div>
+        </div>
+
+        <div className="px-4 pb-4">
+          <div className="flex justify-between items-start mt-2">
             <div>
-              <button>
-                <img src="/src/assets/light-menu.svg" alt="" />
-              </button>
+              <h1 className="text-xl font-bold text-[#10284C]">
+                {event.title}
+              </h1>
+              <p className="text-sm text-gray-600">
+                Kategori: {event.category} | Status:{" "}
+                <span className="font-bold uppercase">{event.status}</span>
+              </p>
             </div>
-          </div>
-          <div className="w-full flex flex-row gap-2 my-4">
-            <div className="w-1/2 border-2 border-[#00000080] rounded-lg bg-[#FFF3DB]">
-              <button className="flex justify-around items-center w-full p-3 h-full cursor-pointer">
-                <span className="font-bold text-lg">120</span>
-                <p className="text-sm">Peserta Terdata</p>
-              </button>
-            </div>
-            <div className="w-1/2 border-2 border-[#00000080] rounded-lg bg-[#F9DDAE]">
-              <button className="flex justify-between items-center w-full p-3 h-full cursor-pointer">
-                <p className="text-sm">Scan Peserta</p>
-                <img src="/src/assets/arrow-right.svg" className="w-6" alt="" />
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <p className="font-bold text-[#10284C]">Nama Peserta</p>
-            <form action="" className="flex">
-              <div className="relative flex items-center mb-2 w-full gap-2">
-                <img
-                  src="/src/assets/person.svg"
-                  alt="name"
-                  className="absolute ml-3 w-3.5 pointer-events-none"
-                />
-                <input
-                  type="text"
-                  className="bg-[#FFFFFF] w-9/10 p-2 rounded-lg border-2 border-[#C4D3DF] pl-8"
-                  placeholder="hako"
-                />
+
+            {/* --- START / FINISH EVENT BUTTON --- */}
+            <div>
+              {event.status === "preparation" && (
                 <button
-                  type="submit"
-                  className="w-1/10 p-2 bg-[#10284C] text-white rounded-lg"
+                  onClick={() => handleUpdateEventStatus("uncompleted")}
+                  className="bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md hover:bg-green-700 animate-pulse"
                 >
-                  +
+                  Mulai Acara ▶
                 </button>
-              </div>
-            </form>
+              )}
+
+              {event.status === "uncompleted" && allBandulsLocked && (
+                <button
+                  onClick={() => handleUpdateEventStatus("completed")}
+                  className="bg-[#10284C] text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md hover:bg-blue-900"
+                >
+                  Selesai Acara ✅
+                </button>
+              )}
+
+              {event.status === "completed" && (
+                <span className="bg-gray-200 text-gray-600 text-xs font-bold px-3 py-1 rounded">
+                  Selesai
+                </span>
+              )}
+            </div>
           </div>
-          <div className="w-full flex gap-4 mt-4">
+
+          {/* MODE TOGGLE */}
+          <div className="flex gap-4 mt-4">
             <button
-              onClick={() => setRank(0)}
-              className="bg-[#10284C]  cursor-pointer text-white p-2 rounded-lg"
+              onClick={() => handleModeSwitch("input")}
+              className={`flex-1 p-2 rounded-lg font-bold transition ${
+                viewMode === "input"
+                  ? "bg-[#10284C] text-white"
+                  : "bg-[#FFF3DB] border border-black/20"
+              }`}
             >
-              Input skor
+              Input Skor
             </button>
             <button
-              onClick={() => setRank(1)}
-              className="bg-[#F2EADA] cursor-pointer border border-[#000000] p-2 rounded-lg"
+              onClick={() => handleModeSwitch("rank")}
+              className={`flex-1 p-2 rounded-lg font-bold transition ${
+                viewMode === "rank"
+                  ? "bg-[#10284C] text-white"
+                  : "bg-[#FFF3DB] border border-black/20"
+              }`}
             >
               Peringkat
             </button>
           </div>
-          <div className="flex items-center mt-4 bg-[#10284C] font-semibold text-white h-[45px] w-full rounded-t-lg">
-            <p className="ml-3">Daftar Atlet</p>
-          </div>
-          <div className="flex items-center justify-center bg-[#FFF3DB] h-[233px] w-full rounded-b-lg border p-4 border-black/50">
-            <div className="flex flex-col p-3 bg-[#F2CE92] font-semibold h-[209px] w-full rounded-lg border">
-              <p>Atlet1</p>
-              <p className="mt-1.5">
-                Total Skor: 0 | <span>Jumlah Meleset: 0</span>
-              </p>
-              <p className="mt-3">Skor seri:</p>
-              <div className="flex justify-center flex-row mt-2 gap-2">
-                <button className="flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg">
-                  1
+
+          {/* BANDUL FILTER */}
+          <div className="mt-4">
+            <label className="text-xs font-bold text-gray-500 uppercase">
+              Pilih Bandul
+            </label>
+            <div className="flex gap-2 overflow-x-auto pb-2 mt-1 scrollbar-hide">
+              {viewMode === "rank" && (
+                <button
+                  onClick={() => setSelectedBandulId(null)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-sm border ${
+                    !selectedBandulId ? "bg-[#10284C] text-white" : "bg-white"
+                  }`}
+                >
+                  Semua
                 </button>
-                <button className="flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg">
-                  2
+              )}
+
+              {banduls.map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => setSelectedBandulId(b.id)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-sm border flex items-center gap-1 ${
+                    selectedBandulId === b.id
+                      ? "bg-[#10284C] text-white"
+                      : "bg-white"
+                  }`}
+                >
+                  {/* FIXED: Use !! to force boolean so '0' doesn't print */}
+                  {!!b.is_locked && <span>🔒</span>}
+                  {b.name}
                 </button>
-                <button className="flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg">
-                  3
-                </button>
-                <button className="flex items-center justify-center bg-[#FFFAF0] h-[37px] w-[81px] border rounded-lg">
-                  4
-                </button>
-              </div>
-              <div className="flex justify-center flex-row mt-2 gap-2">
-                <button className="flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black">
-                  3
-                </button>
-                <button className="flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black">
-                  1
-                </button>
-                <button className="flex items-center justify-center bg-[#10284C] text-white h-[37px] w-[111px] border rounded-lg border-black">
-                  Meleset
-                </button>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 bg-[#FCE8CA] rounded-t-lg h-[12vh] py-4 w-full text-sm border border-[#00000080]">
-        <div className="flex justify-around items-center">
-          <button className="bg-[#FFFFFF] border-[#1E1E1E] border rounded-lg p-2 flex items-center justify-around gap-1 w-28">
-            <img src="/src/assets/back.svg" className="brightness-0" alt="" />
-            <p>Kembali</p>
+
+      {/* CONTENT AREA */}
+      <div className="p-4 flex-1">
+        {/* === INPUT MODE === */}
+        {viewMode === "input" && (
+          <div className="space-y-4">
+            {!isInputAllowed && selectedBandulId && (
+              <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm font-bold text-center border border-red-200">
+                {event.status === "preparation"
+                  ? "Acara belum dimulai."
+                  : event.status === "completed"
+                  ? "Acara sudah selesai."
+                  : "Bandul ini terkunci (Selesai)."}
+              </div>
+            )}
+
+            {participants.map((p) => {
+              const isExpanded = expandedParticipant === p.id;
+              const currentScores = unsavedChanges[p.id] || {
+                arrow1: 0,
+                arrow2: 0,
+                arrow3: 0,
+                arrow4: 0,
+              };
+              const total =
+                currentScores.arrow1 +
+                currentScores.arrow2 +
+                currentScores.arrow3 +
+                currentScores.arrow4;
+              const misses = [
+                currentScores.arrow1,
+                currentScores.arrow2,
+                currentScores.arrow3,
+                currentScores.arrow4,
+              ].filter((x) => x === 0).length;
+
+              return (
+                <div
+                  key={p.id}
+                  className={`rounded-lg border border-black/20 overflow-hidden transition-all ${
+                    isExpanded ? "bg-[#FFF3DB]" : "bg-white"
+                  }`}
+                >
+                  <div
+                    onClick={() => {
+                      if (isInputAllowed)
+                        setExpandedParticipant(isExpanded ? null : p.id);
+                    }}
+                    className={`p-4 flex justify-between items-center cursor-pointer ${
+                      !isInputAllowed ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <div>
+                      <p className="font-bold text-[#10284C]">{p.name}</p>
+                      <p className="text-xs text-gray-600">
+                        Total: {total} | Miss: {misses}
+                      </p>
+                    </div>
+                    <div className="text-lg font-bold text-[#10284C]">
+                      {isInputAllowed ? (isExpanded ? "▲" : "▼") : "🔒"}
+                    </div>
+                  </div>
+
+                  {isExpanded && isInputAllowed && (
+                    <div className="p-4 border-t border-black/10 bg-[#F2CE92]/20">
+                      <p className="text-sm font-bold mb-2">
+                        Pilih Anak Panah:
+                      </p>
+                      <div className="flex gap-2 mb-4">
+                        {[1, 2, 3, 4].map((num) => (
+                          <button
+                            key={num}
+                            onClick={() => setSelectedArrowSlot(num)}
+                            className={`h-10 w-10 rounded-lg border font-bold ${
+                              selectedArrowSlot === num
+                                ? "bg-[#10284C] text-white ring-2 ring-offset-1 ring-[#10284C]"
+                                : "bg-white"
+                            }`}
+                          >
+                            {num}
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="text-sm font-bold mb-2">
+                        Isi Nilai (untuk Panah {selectedArrowSlot}):
+                      </p>
+                      <div className="flex gap-2 mb-4 flex-wrap">
+                        {getScoreButtons().map((btn) => (
+                          <button
+                            key={btn.val}
+                            onClick={() => handleScoreInput(btn.val)}
+                            className={`px-4 py-2 rounded-lg border font-bold shadow-sm ${btn.color}`}
+                          >
+                            {btn.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-between items-center bg-white p-2 rounded-lg mb-4">
+                        <span className="text-xs">Preview:</span>
+                        {[1, 2, 3, 4].map((n) => (
+                          <span
+                            key={n}
+                            className="font-mono bg-gray-100 px-2 rounded"
+                          >
+                            {currentScores[`arrow${n}`] === 0
+                              ? "M"
+                              : currentScores[`arrow${n}`]}
+                          </span>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => saveScore(p.id)}
+                        className="w-full bg-[#10284C] text-white py-2 rounded-lg font-bold"
+                      >
+                        Simpan Skor
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {participants.length === 0 && viewMode === "input" && (
+              <div className="text-center text-gray-500 mt-10">
+                Pilih Bandul untuk melihat peserta.
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* === RANK MODE === */}
+        {viewMode === "rank" && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex gap-2 bg-white rounded-lg p-1 border">
+                <button
+                  onClick={() => setRankType("rambahan")}
+                  className={`px-3 py-1 rounded text-xs font-bold ${
+                    rankType === "rambahan" ? "bg-[#10284C] text-white" : ""
+                  }`}
+                >
+                  Rambahan Ini
+                </button>
+                <button
+                  onClick={() => setRankType("total")}
+                  className={`px-3 py-1 rounded text-xs font-bold ${
+                    rankType === "total" ? "bg-[#10284C] text-white" : ""
+                  }`}
+                >
+                  Total
+                </button>
+              </div>
+              <button
+                onClick={handlePrint}
+                className="bg-white border p-2 rounded shadow-sm text-xs font-bold"
+              >
+                🖨️ Cetak
+              </button>
+            </div>
+
+            <div
+              ref={componentRef}
+              className="bg-white p-4 rounded-lg shadow-sm print:shadow-none"
+            >
+              <h2 className="text-center font-bold text-lg mb-2 hidden print:block">
+                Hasil {event.title} -{" "}
+                {rankType === "total" ? "Overall" : `Rambahan ${rambahan}`}
+              </h2>
+              <table className="w-full text-sm text-left">
+                <thead className="text-[#10284C] uppercase bg-gray-50">
+                  <tr>
+                    <th className="px-2 py-3">#</th>
+                    <th className="px-2 py-3">Nama</th>
+                    {rankType === "rambahan" && (
+                      <th className="px-2 py-3 text-center">Detail</th>
+                    )}
+                    <th className="px-2 py-3 text-center">Hit</th>
+                    <th className="px-2 py-3 text-center">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaderboardData.map((row, idx) => (
+                    <tr key={idx} className="border-b hover:bg-gray-50">
+                      <td className="px-2 py-3 font-bold">{idx + 1}</td>
+                      <td className="px-2 py-3">
+                        <div className="font-medium">{row.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {row.bandul_name}
+                        </div>
+                      </td>
+                      {rankType === "rambahan" && (
+                        <td className="px-2 py-3 text-center font-mono text-xs">
+                          {row.a1}-{row.a2}-{row.a3}-{row.a4}
+                        </td>
+                      )}
+                      <td className="px-2 py-3 text-center">{row.hits}</td>
+                      <td className="px-2 py-3 text-center font-bold text-lg">
+                        {row.total}
+                      </td>
+                    </tr>
+                  ))}
+                  {leaderboardData.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="text-center py-4">
+                        Belum ada data skor.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* === RAMBAHAN 20 LOCK BUTTON === */}
+        {viewMode === "input" && rambahan === 20 && isInputAllowed && (
+          <div className="mt-8 mb-4">
+            <button
+              onClick={() => setShowLockConfirm(true)}
+              className="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition flex justify-center items-center gap-2"
+            >
+              🔒 Kunci Bandul (Selesai)
+            </button>
+            <p className="text-center text-xs text-gray-500 mt-2">
+              Tekan tombol ini jika seluruh sesi pada bandul ini telah selesai.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* FOOTER NAV */}
+      <div className="fixed bottom-0 left-0 w-full bg-[#FCE8CA] border-t border-[#00000080] p-4 rounded-t-xl z-20">
+        <div className="flex justify-between items-center max-w-md mx-auto">
+          <button
+            disabled={rambahan <= 1}
+            onClick={() => setRambahan((r) => r - 1)}
+            className="bg-white border border-[#1E1E1E] rounded-lg px-4 py-2 flex items-center gap-2 disabled:opacity-50"
+          >
+            ← Prev
           </button>
-          <p>Seri: 1/20</p>
-          <button className="bg-[#10284C] border-[#1E1E1E] border rounded-lg p-2 text-white flex items-center justify-around gap-1 w-28">
-            <p>Lanjut</p>
-            <img src="/src/assets/right-white.svg" alt="" />
+
+          <div className="font-bold text-[#10284C]">
+            Rambahan: {rambahan} / 20
+          </div>
+
+          <button
+            disabled={rambahan >= 20}
+            onClick={() => setRambahan((r) => r + 1)}
+            className="bg-[#10284C] text-white border border-[#1E1E1E] rounded-lg px-4 py-2 flex items-center gap-2 disabled:opacity-50"
+          >
+            Next →
           </button>
         </div>
       </div>
+
+      {/* === LOCK CONFIRMATION MODAL === */}
+      {showLockConfirm && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-xl font-bold text-[#10284C] mb-2">
+              Kunci Bandul?
+            </h3>
+            <p className="text-gray-600 text-sm mb-6">
+              Anda tidak akan bisa mengubah skor lagi setelah bandul dikunci.
+              Pastikan semua skor di Rambahan 1-20 sudah benar.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLockConfirm(false)}
+                className="flex-1 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleLockBandul}
+                className="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold"
+              >
+                Ya, Kunci
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

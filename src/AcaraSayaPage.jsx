@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
 export default function AcaraSayaPage() {
   const navigate = useNavigate();
@@ -129,9 +130,7 @@ export default function AcaraSayaPage() {
               >
                 <div className="h-32 w-full bg-gray-200 relative">
                   <img
-                    src={
-                      ev.banner || "/src/assets/banner/PlaceholderBanner.png"
-                    }
+                    src={ev.banner || placeholderbanner}
                     alt={ev.title}
                     className="w-full h-full object-cover"
                   />

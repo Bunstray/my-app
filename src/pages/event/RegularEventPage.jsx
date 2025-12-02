@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
 export default function RegularEventPage() {
   const { id } = useParams();
@@ -141,7 +142,7 @@ export default function RegularEventPage() {
       <div className="bg-[#FFFAF0] sticky top-0 z-10 shadow-sm">
         <div className="w-full h-48 overflow-hidden relative">
           <img
-            src={event.banner || "/src/assets/banner/PlaceholderBanner.png"}
+            src={event.banner || placeholderbanner}
             alt="Event Banner"
             className="w-full h-full object-cover"
           />

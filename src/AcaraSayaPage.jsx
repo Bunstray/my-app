@@ -21,7 +21,7 @@ export default function AcaraSayaPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://34.204.192.78/user/${userId}/joined-events`
+        `http://34.204.192.78:5000/user/${userId}/joined-events`
       );
       if (res.ok) {
         const data = await res.json();

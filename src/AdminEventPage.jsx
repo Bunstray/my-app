@@ -41,13 +41,13 @@ export default function AdminEventPage() {
   }, [selectedBandulId, rambahan, viewMode, rankType]);
 
   const fetchEventDetails = async () => {
-    const res = await fetch(`http://34.204.192.78/event/${id}`);
+    const res = await fetch(`http://34.204.192.78:5000/event/${id}`);
     const data = await res.json();
     setEvent(data);
   };
 
   const fetchBanduls = async () => {
-    const res = await fetch(`http://34.204.192.78/event/${id}/bandul`);
+    const res = await fetch(`http://34.204.192.78:5000/event/${id}/bandul`);
     const data = await res.json();
     setBanduls(data);
     if (data.length > 0 && !selectedBandulId) setSelectedBandulId(data[0].id);
@@ -56,7 +56,7 @@ export default function AdminEventPage() {
   const fetchParticipants = async () => {
     if (!selectedBandulId) return;
     const res = await fetch(
-      `http://34.204.192.78/bandul/${selectedBandulId}/participants?rambahan=${rambahan}`
+      `http://34.204.192.78:5000/bandul/${selectedBandulId}/participants?rambahan=${rambahan}`
     );
     const data = await res.json();
 
@@ -74,7 +74,7 @@ export default function AdminEventPage() {
   };
 
   const fetchLeaderboard = async () => {
-    let url = `http://34.204.192.78/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
+    let url = `http://34.204.192.78:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
     if (selectedBandulId) url += `&bandulId=${selectedBandulId}`;
     else url += `&bandulId=all`;
     const res = await fetch(url);
@@ -103,7 +103,7 @@ export default function AdminEventPage() {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      await fetch(`http://34.204.192.78/event/${id}/status`, {
+      await fetch(`http://34.204.192.78:5000/event/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -116,7 +116,7 @@ export default function AdminEventPage() {
 
   const handleLockBandul = async () => {
     try {
-      await fetch(`http://34.204.192.78/bandul/${selectedBandulId}/lock`, {
+      await fetch(`http://34.204.192.78:5000/bandul/${selectedBandulId}/lock`, {
         method: "PUT",
       });
       setShowLockConfirm(false);
@@ -143,7 +143,7 @@ export default function AdminEventPage() {
   const saveScore = async (participantId) => {
     const scores = unsavedChanges[participantId];
     try {
-      await fetch("http://34.204.192.78/score", {
+      await fetch("http://34.204.192.78:5000/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

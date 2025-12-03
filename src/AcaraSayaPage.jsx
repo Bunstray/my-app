@@ -22,7 +22,7 @@ export default function AcaraSayaPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://3.229.130.181:5000/user/${userId}/joined-events`
+        `https://unpitiful-defilingly-floretta.ngrok-free.dev/user/${userId}/joined-events`
       );
       if (res.ok) {
         const data = await res.json();

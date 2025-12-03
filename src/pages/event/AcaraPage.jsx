@@ -19,7 +19,9 @@ export default function AcaraPage() {
   useEffect(() => {
     async function loadEvents() {
       try {
-        const res = await fetch("http://3.229.130.181:5000/events");
+        const res = await fetch(
+          "https://unpitiful-defilingly-floretta.ngrok-free.dev/events"
+        );
         const data = await res.json();
         setEvents(data);
       } catch (err) {

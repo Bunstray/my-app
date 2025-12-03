@@ -41,17 +41,20 @@ export default function CreateEventPage() {
 
     const created_by = localStorage.getItem("id");
 
-    const res = await fetch("http://3.229.130.181:5000/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        date,
-        category: selectedCategory,
-        banner: "", // placeholder
-        created_by,
-      }),
-    });
+    const res = await fetch(
+      "https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          date,
+          category: selectedCategory,
+          banner: "", // placeholder
+          created_by,
+        }),
+      }
+    );
 
     const data = await res.json();
 

@@ -42,7 +42,9 @@ export default function RegularEventPage() {
 
   const fetchEventDetails = async () => {
     try {
-      const res = await fetch(`http://3.229.130.181:5000/event/${id}`);
+      const res = await fetch(
+        `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}`
+      );
       if (!res.ok) throw new Error("Event not found");
       const data = await res.json();
       setEvent(data);
@@ -55,20 +57,22 @@ export default function RegularEventPage() {
   const fetchUserStatus = async () => {
     if (!userId) return;
     const res = await fetch(
-      `http://3.229.130.181:5000/event/${id}/user-status/${userId}`
+      `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/user-status/${userId}`
     );
     const data = await res.json();
     setUserStatus(data);
   };
 
   const fetchBanduls = async () => {
-    const res = await fetch(`http://3.229.130.181:5000/event/${id}/bandul`);
+    const res = await fetch(
+      `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/bandul`
+    );
     const data = await res.json();
     setBanduls(data);
   };
 
   const fetchLeaderboard = async () => {
-    let url = `http://3.229.130.181:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
+    let url = `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
     if (selectedBandulFilter) url += `&bandulId=${selectedBandulFilter}`;
     else url += `&bandulId=all`;
 
@@ -91,15 +95,18 @@ export default function RegularEventPage() {
     }
 
     try {
-      const res = await fetch("http://3.229.130.181:5000/join-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventId: id,
-          userId: userId,
-          bandulId: selectedBandulToJoin,
-        }),
-      });
+      const res = await fetch(
+        "https://unpitiful-defilingly-floretta.ngrok-free.dev/join-event",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventId: id,
+            userId: userId,
+            bandulId: selectedBandulToJoin,
+          }),
+        }
+      );
       const data = await res.json();
 
       if (res.ok) {

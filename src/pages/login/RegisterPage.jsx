@@ -12,7 +12,7 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     const res = await fetch(
-      "https://unpitiful-defilingly-floretta.ngrok-free.dev/register",
+      "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/register",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

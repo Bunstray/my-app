@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
 const res = await fetch(
-  "https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
+  "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/events",
   {
     headers: new Headers({
       "ngrok-skip-browser-warning": "69420",
@@ -29,7 +29,7 @@ export default function AcaraPage() {
     async function loadEvents() {
       try {
         const res = await fetch(
-          "https://unpitiful-defilingly-floretta.ngrok-free.dev/events"
+          "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/events"
         );
         const data = await res.json();
         setEvents(data);

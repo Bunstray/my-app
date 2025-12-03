@@ -4,7 +4,7 @@ import { useReactToPrint } from "react-to-print";
 import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
 const res = await fetch(
-  "https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
+  "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/events",
   {
     headers: new Headers({
       "ngrok-skip-browser-warning": "69420",
@@ -52,7 +52,7 @@ export default function AdminEventPage() {
 
   const fetchEventDetails = async () => {
     const res = await fetch(
-      `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}`
+      `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}`
     );
     const data = await res.json();
     setEvent(data);
@@ -60,7 +60,7 @@ export default function AdminEventPage() {
 
   const fetchBanduls = async () => {
     const res = await fetch(
-      `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/bandul`
+      `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/bandul`
     );
     const data = await res.json();
     setBanduls(data);
@@ -70,7 +70,7 @@ export default function AdminEventPage() {
   const fetchParticipants = async () => {
     if (!selectedBandulId) return;
     const res = await fetch(
-      `https://unpitiful-defilingly-floretta.ngrok-free.dev/bandul/${selectedBandulId}/participants?rambahan=${rambahan}`
+      `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/bandul/${selectedBandulId}/participants?rambahan=${rambahan}`
     );
     const data = await res.json();
 
@@ -88,7 +88,7 @@ export default function AdminEventPage() {
   };
 
   const fetchLeaderboard = async () => {
-    let url = `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
+    let url = `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
     if (selectedBandulId) url += `&bandulId=${selectedBandulId}`;
     else url += `&bandulId=all`;
     const res = await fetch(url);
@@ -118,7 +118,7 @@ export default function AdminEventPage() {
 
     try {
       await fetch(
-        `https://unpitiful-defilingly-floretta.ngrok-free.dev/event/${id}/status`,
+        `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -134,7 +134,7 @@ export default function AdminEventPage() {
   const handleLockBandul = async () => {
     try {
       await fetch(
-        `https://unpitiful-defilingly-floretta.ngrok-free.dev/bandul/${selectedBandulId}/lock`,
+        `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/bandul/${selectedBandulId}/lock`,
         {
           method: "PUT",
         }
@@ -164,7 +164,7 @@ export default function AdminEventPage() {
     const scores = unsavedChanges[participantId];
     try {
       await fetch(
-        "https://unpitiful-defilingly-floretta.ngrok-free.dev/score",
+        "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/score",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

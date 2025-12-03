@@ -17,7 +17,7 @@ export default function LupaPwWage() {
     try {
       // 1. Send the email to the backend
       const res = await fetch(
-        "https://unpitiful-defilingly-floretta.ngrok-free.dev/forgot-password",
+        "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -37,7 +37,7 @@ export default function ChangePasswordPage() {
       if (isResetMode) {
         // Forgot Password Flow
         url =
-          "https://unpitiful-defilingly-floretta.ngrok-free.dev/reset-password";
+          "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/reset-password";
         body = { token, newPassword };
       } else {
         // Logged In Change Password Flow
@@ -53,7 +53,7 @@ export default function ChangePasswordPage() {
         }
 
         url =
-          "https://unpitiful-defilingly-floretta.ngrok-free.dev/change-password-logged-in";
+          "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/change-password-logged-in";
         body = { userId, oldPassword, newPassword };
       }
 

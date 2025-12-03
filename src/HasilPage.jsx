@@ -2,6 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
+const res = await fetch(
+  "https://https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
+  {
+    headers: new Headers({
+      "ngrok-skip-browser-warning": "69420",
+    }),
+  }
+);
+
 export default function HasilPage() {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);

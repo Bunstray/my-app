@@ -11,14 +11,11 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
 
   const handleRegister = async () => {
-    const res = await fetch(
-      "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/register",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password, conpassword }),
-      }
-    );
+    const res = await fetch("3.229.130.181:5000/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, username, password, conpassword }),
+    });
 
     const data = await res.json();
     alert(data.message);

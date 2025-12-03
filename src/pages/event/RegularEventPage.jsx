@@ -41,22 +41,8 @@ export default function RegularEventPage() {
   }, [id, rankType, rambahan, selectedBandulFilter]);
 
   const fetchEventDetails = async () => {
-    // ... inside loadEvents function ...
-
-    const res = await fetch(
-      "https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
-      {
-        headers: new Headers({
-          "ngrok-skip-browser-warning": "69420",
-        }),
-      }
-    );
-
-    // ... rest of code
     try {
-      const res = await fetch(
-        `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}`
-      );
+      const res = await fetch(`3.229.130.181:5000/event/${id}`);
       if (!res.ok) throw new Error("Event not found");
       const data = await res.json();
       setEvent(data);
@@ -69,22 +55,20 @@ export default function RegularEventPage() {
   const fetchUserStatus = async () => {
     if (!userId) return;
     const res = await fetch(
-      `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/user-status/${userId}`
+      `3.229.130.181:5000/event/${id}/user-status/${userId}`
     );
     const data = await res.json();
     setUserStatus(data);
   };
 
   const fetchBanduls = async () => {
-    const res = await fetch(
-      `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/bandul`
-    );
+    const res = await fetch(`3.229.130.181:5000/event/${id}/bandul`);
     const data = await res.json();
     setBanduls(data);
   };
 
   const fetchLeaderboard = async () => {
-    let url = `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
+    let url = `3.229.130.181:5000/event/${id}/leaderboard?type=${rankType}&rambahan=${rambahan}`;
     if (selectedBandulFilter) url += `&bandulId=${selectedBandulFilter}`;
     else url += `&bandulId=all`;
 
@@ -107,18 +91,15 @@ export default function RegularEventPage() {
     }
 
     try {
-      const res = await fetch(
-        "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/join-event",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            eventId: id,
-            userId: userId,
-            bandulId: selectedBandulToJoin,
-          }),
-        }
-      );
+      const res = await fetch("3.229.130.181:5000/join-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: id,
+          userId: userId,
+          bandulId: selectedBandulToJoin,
+        }),
+      });
       const data = await res.json();
 
       if (res.ok) {

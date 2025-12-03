@@ -4,15 +4,6 @@ import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 import bandul321 from "/src/assets/Bandul/Bandul3-2-1.png";
 import bandul31 from "/src/assets/Bandul/Bandul3-1.png";
 
-const res = await fetch(
-  "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/events",
-  {
-    headers: new Headers({
-      "ngrok-skip-browser-warning": "69420",
-    }),
-  }
-);
-
 export default function CreateEventPage() {
   const navigate = useNavigate();
 

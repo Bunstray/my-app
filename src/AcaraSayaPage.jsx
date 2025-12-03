@@ -2,15 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
-const res = await fetch(
-  "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/events",
-  {
-    headers: new Headers({
-      "ngrok-skip-browser-warning": "69420",
-    }),
-  }
-);
-
 export default function AcaraSayaPage() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");

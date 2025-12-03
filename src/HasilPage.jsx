@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholderbanner from "/src/assets/Banner/PlaceholderBanner.png";
 
-const res = await fetch("3.229.130.181:5000/events", {
+const res = await fetch("http://3.229.130.181:5000/events", {
   headers: new Headers({
     "ngrok-skip-browser-warning": "69420",
   }),
@@ -16,7 +16,7 @@ export default function HasilPage() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const res = await fetch("3.229.130.181:5000/events");
+        const res = await fetch("http://3.229.130.181:5000/events");
         const data = await res.json();
         // Filter ONLY completed events
         const completedEvents = data.filter((e) => e.status === "completed");

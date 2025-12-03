@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
 
   const handleRegister = async () => {
-    const res = await fetch("3.229.130.181:5000/register", {
+    const res = await fetch("http://3.229.130.181:5000/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, username, password, conpassword }),

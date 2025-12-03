@@ -20,15 +20,12 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch(
-        "https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          // Send as 'identifier' to the backend
-          body: JSON.stringify({ identifier, password }),
-        }
-      );
+      const res = await fetch("3.229.130.181:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Send as 'identifier' to the backend
+        body: JSON.stringify({ identifier, password }),
+      });
 
       const data = await res.json();
       if (res.ok) {

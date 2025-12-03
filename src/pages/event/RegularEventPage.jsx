@@ -41,6 +41,18 @@ export default function RegularEventPage() {
   }, [id, rankType, rambahan, selectedBandulFilter]);
 
   const fetchEventDetails = async () => {
+    // ... inside loadEvents function ...
+
+    const res = await fetch(
+      "https://unpitiful-defilingly-floretta.ngrok-free.dev/events",
+      {
+        headers: new Headers({
+          "ngrok-skip-browser-warning": "69420",
+        }),
+      }
+    );
+
+    // ... rest of code
     try {
       const res = await fetch(
         `https://unpitiful-defilingly-floretta.ngrok-free.dev:5000/event/${id}`

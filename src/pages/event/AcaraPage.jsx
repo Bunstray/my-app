@@ -19,7 +19,7 @@ export default function AcaraPage() {
   useEffect(() => {
     async function loadEvents() {
       try {
-        const res = await fetch("http://34.204.192.78:5000/events");
+        const res = await fetch("http://3.229.130.181:5000/events");
         const data = await res.json();
         setEvents(data);
       } catch (err) {

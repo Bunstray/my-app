@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://34.204.192.78:5000/login", {
+      const res = await fetch("http://3.229.130.181:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Send as 'identifier' to the backend
